@@ -62,7 +62,7 @@ const YouTubeSearch = () => {
             part: "snippet",
             q,
             type: "video",
-            maxResults: 20,
+            maxResults: 50,
             key: API_KEY,
           },
         },
