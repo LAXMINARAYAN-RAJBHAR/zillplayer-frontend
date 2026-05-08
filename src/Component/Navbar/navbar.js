@@ -17,6 +17,7 @@ const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
   );
   const [navbarModal, setNavbarModal] = useState(false);
   const [login, setLogin] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // ✅ ADDED
   const navigate = useNavigate();
 
   const sideNavbarFunc = () => {
@@ -34,10 +35,24 @@ const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
 
   const onclickOfPopUpOption = (button) => {
     setNavbarModal(false);
-
     if (button === "login") {
       setLogin(true);
-    } else {
+    }
+  };
+
+  // ✅ ADDED
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      navigate(`/youtube?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    }
+  };
+
+  // ✅ ADDED
+  const handleSearchClick = () => {
+    if (searchQuery.trim()) {
+      navigate(`/youtube?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
     }
   };
 
@@ -48,7 +63,6 @@ const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
         <div className="navbarHamberger" onClick={sideNavbarFunc}>
           <ListIcon sx={{ color: "white" }} />
         </div>
-
         <Link to="/" className="navbar-logo-link">
           <img src={MyLogo} alt="App Logo" className="mylogo" />
           <span
@@ -57,9 +71,9 @@ const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
               const base =
                 window.location.origin + window.location.pathname + "#/";
               if (window.location.href === base) {
-                window.location.reload(); // already on home, just reload
+                window.location.reload();
               } else {
-                window.location.href = base; // navigate to home (acts as reload)
+                window.location.href = base;
               }
             }}
           >
@@ -79,12 +93,17 @@ const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
       {/* MIDDLE */}
       <div className="navbar-middle">
         <div className="navbar_searchBox">
+          {/* ✅ UPDATED input */}
           <input
             type="text"
             placeholder="Search"
             className="navbar_searchBoxInput"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch}
           />
-          <div className="navbar_searchIconBox">
+          {/* ✅ UPDATED icon click */}
+          <div className="navbar_searchIconBox" onClick={handleSearchClick}>
             <SearchIcon sx={{ fontSize: "28px" }} />
           </div>
         </div>
@@ -95,29 +114,16 @@ const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
 
       {/* RIGHT */}
       <div className="navbar-right">
-        
-        {/* ADD HERE ✅ */}
         <Link to="/youtube">
-          <YouTubeIcon
-            sx={{ fontSize: "30px", cursor: "pointer", color: "red" }}
-          />
+          <YouTubeIcon sx={{ fontSize: "30px", cursor: "pointer", color: "red" }} />
         </Link>
-
         <Link to={"/reels"}>
-          <VideoLibraryIcon
-            sx={{ fontSize: "30px", cursor: "pointer", color: "white" }}
-          />
+          <VideoLibraryIcon sx={{ fontSize: "30px", cursor: "pointer", color: "white" }} />
         </Link>
-
         <Link to={"/763/upload"}>
-          <VideoCameraFrontIcon
-            sx={{ fontSize: "30px", cursor: "pointer", color: "white" }}
-          />
+          <VideoCameraFrontIcon sx={{ fontSize: "30px", cursor: "pointer", color: "white" }} />
         </Link>
-
-        <NotificationsActiveIcon
-          sx={{ fontSize: "30px", cursor: "pointer", color: "white" }}
-        />
+        <NotificationsActiveIcon sx={{ fontSize: "30px", cursor: "pointer", color: "white" }} />
         <img
           onClick={() => setNavbarModal((prev) => !prev)}
           src={userPic}
@@ -126,21 +132,9 @@ const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
         />
         {navbarModal && (
           <div className="navbar-modal">
-            <div className="navbar-modal-option" onClick={handleprofile}>
-              Profile
-            </div>
-            <div
-              className="navbar-modal-option"
-              onClick={() => onclickOfPopUpOption("logout")}
-            >
-              Logout
-            </div>
-            <div
-              className="navbar-modal-option"
-              onClick={() => onclickOfPopUpOption("login")}
-            >
-              Login
-            </div>
+            <div className="navbar-modal-option" onClick={handleprofile}>Profile</div>
+            <div className="navbar-modal-option" onClick={() => onclickOfPopUpOption("logout")}>Logout</div>
+            <div className="navbar-modal-option" onClick={() => onclickOfPopUpOption("login")}>Login</div>
           </div>
         )}
       </div>
