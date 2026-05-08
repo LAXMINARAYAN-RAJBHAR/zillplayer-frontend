@@ -9,6 +9,7 @@ import VideoUpload from "./Pages/VideoUpload/videoUpload";
 import SignUp from "./Pages/SignUp/signUp";
 import Reels from "./Component/Reels/reels";
 import Footer from './Component/Footer/footer';
+import YouTubeSearch from "./Component/YouTubeSearch/youTubeSearch";
 
 function App() {
   const [sideNavbar, setSideNavbar] = useState(false);
@@ -28,6 +29,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/reels" element={<Reels />} />
         <Route path="/profile/:username" element={<Profile sideNavbar={sideNavbar} />} />
+        <Route path="/youtube" element={<YouTubeSearch />} />
       </Routes>
       <Footer />   {/* ✅ Added here */}
     </div>

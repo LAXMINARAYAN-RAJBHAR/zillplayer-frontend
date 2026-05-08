@@ -9,6 +9,7 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import { Link, useNavigate } from "react-router-dom";
 import Login from "../Login/login";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
+import YouTubeIcon from "@mui/icons-material/YouTube";
 
 const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
   const [userPic] = useState(
@@ -94,6 +95,14 @@ const Navbar = ({ setSideNavbarFunc, sideNavbar }) => {
 
       {/* RIGHT */}
       <div className="navbar-right">
+        
+        {/* ADD HERE ✅ */}
+        <Link to="/youtube">
+          <YouTubeIcon
+            sx={{ fontSize: "30px", cursor: "pointer", color: "red" }}
+          />
+        </Link>
+
         <Link to={"/reels"}>
           <VideoLibraryIcon
             sx={{ fontSize: "30px", cursor: "pointer", color: "white" }}
