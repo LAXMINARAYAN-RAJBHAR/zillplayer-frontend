@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./video.css";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
@@ -552,6 +552,7 @@ const Video = () => {
   const [showControls, setShowControls] = useState(true);
   const [videoError, setVideoError] = useState(false); // ✅ NEW: tracks unsupported format errors
   const controlsTimer = useRef(null);
+  const videoRef = useRef(null); // ADD THIS
 
   const currentIndex = videos.findIndex((v) => v.id === Number(id));
   const video = videos[currentIndex];
@@ -572,6 +573,20 @@ const Video = () => {
   const handleVideoError = () => {
     setVideoError(true);
   };
+
+  useEffect(() => {
+    const handleSpacebar = (e) => {
+      if (e.code === "Space" || e.key === " ") {
+        e.preventDefault();
+        const vid = videoRef.current;
+        if (!vid) return;
+        vid.paused ? vid.play() : vid.pause();
+      }
+    };
+
+    window.addEventListener("keydown", handleSpacebar);
+    return () => window.removeEventListener("keydown", handleSpacebar);
+  }, []);
 
   if (!video)
     return <p style={{ color: "white", padding: "20px" }}>Video not found</p>;
@@ -653,6 +668,7 @@ const Video = () => {
 
           {/* ✅ STEP 6: Updated <video> tag — uses <source> with correct MIME type */}
           <video
+            ref={videoRef} // ADD THIS
             key={video.id}
             controls
             autoPlay
