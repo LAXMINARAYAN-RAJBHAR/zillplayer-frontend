@@ -3,6 +3,8 @@ import "./video.css";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import { allVideos } from "../../data/videosData";
+// then rename your local `videos` variable to `allVideos` in both files
 
 // ✅ STEP 1: Helper to detect video MIME type from file extension
 const getVideoType = (src) => {
@@ -718,7 +720,7 @@ const Video = () => {
           <div className="youtube_video_ProfileBlock">
             <div className="youtube_video_ProfileBlock_left">
               <Link
-                to={"/user/8998"}
+                to={`/user/${video.channel.toLowerCase()}`}
                 className="youtube_video_ProfileBlock_left_img"
               >
                 <img
@@ -728,7 +730,12 @@ const Video = () => {
                 />
               </Link>
               <div className="youtubeVideo_subsView">
-                <div className="youtubePostProfileName">{video.channel}</div>
+                <Link
+                  to={`/user/${video.channel.toLowerCase()}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <div className="youtubePostProfileName">{video.channel}</div>
+                </Link>
                 <div className="youtubePostProfileSubs">2024-07-09</div>
               </div>
               <div className="subscribeBtnYoutube">Subscribe</div>

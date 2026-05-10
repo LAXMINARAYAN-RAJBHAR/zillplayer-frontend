@@ -91,6 +91,7 @@ function AppContent() {
         />{" "}
         {/* ✅ only this */}
         <Route path="/:id/upload" element={<VideoUpload />} />
+        <Route path="/user/:username" element={<Profile sideNavbar={sideNavbar} />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/reels" element={<Reels />} />
         <Route path="/search" element={<SearchResults />} />

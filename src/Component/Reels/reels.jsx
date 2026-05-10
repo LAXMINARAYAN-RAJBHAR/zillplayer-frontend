@@ -736,6 +736,20 @@ const ReelItem = ({ reel }) => {
 const Reels = () => {
   const location = useLocation();
 
+  // ✅ Scroll to the correct reel when navigated from homepage
+  useEffect(() => {
+    const reelId = location.state?.reelId;
+    if (reelId) {
+      // Small timeout to let all reel items render first
+      setTimeout(() => {
+        const target = document.getElementById(`reel-${reelId}`);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  }, [location.state?.reelId]);
+
   // ADD THIS
   useEffect(() => {
     const handleKeyDown = (e) => {
