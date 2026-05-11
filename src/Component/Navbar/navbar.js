@@ -246,7 +246,7 @@ const Navbar = ({
               else window.location.href = base;
             }}
           >
-            {"OneWeb".split("").map((char, i) => (
+            {"Only1Media".split("").map((char, i) => (
               <span
                 key={i}
                 className="logoChar"
