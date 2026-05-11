@@ -76,22 +76,24 @@
   font-weight: bold;
   font-size: 20px;
 }
+/* Each .logoChar gets a delay via inline style: animationDelay */
 .logoChar {
   display: inline-block;
   color: white;
-  animation: rollLoop 3s ease-in-out infinite;
+  opacity: 0;
+  animation: typeIn 0.15s ease forwards;
 }
 
-@keyframes rollLoop {
-  0%   { transform: translateY(0) rotate(0deg);    color: white; }
-  20%  { transform: translateY(-8px) rotate(-15deg); color: #f9d423; }
-  40%  { transform: translateY(0) rotate(15deg);   color: #ff4e50; }
-  60%  { transform: translateY(-4px) rotate(-8deg); color: #a855f7; }
-  80%  { transform: translateY(0) rotate(0deg);    color: #00c6ff; }
-  100% { transform: translateY(0) rotate(0deg);    color: white; }
+@keyframes typeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
-
 .navbar {
   display: flex;
   align-items: center;   /* vertically centers all sections */

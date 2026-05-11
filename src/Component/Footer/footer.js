@@ -4,7 +4,7 @@ import './footer.css'
 const Footer = () => {
   return (
     <div className="footer">
-      <p>© {new Date().getFullYear()} One Media Web. All rights reserved.</p>
+      <p>© {new Date().getFullYear()} One Media Web (OneWeb). All rights reserved.</p>
       <p>Developed by <span className="footer_dev">Laxminarayan Rajbhar</span></p>
     </div>
   )
