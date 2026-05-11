@@ -209,7 +209,7 @@ const Navbar = ({ currentUser, setSideNavbarFunc, sideNavbar, notifications, set
               else window.location.href = base;
             }}
           >
-            {"rollamroll".split("").map((char, i) => (
+            {"One Media Web".split("").map((char, i) => (
               <span key={i} className="logoChar" style={{ animationDelay: `${i * 0.1}s` }}>
                 {char}
               </span>
