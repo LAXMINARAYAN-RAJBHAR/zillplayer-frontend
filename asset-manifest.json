@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/zillplayer-frontend/static/css/main.34a4fe75.css",
-    "main.js": "/zillplayer-frontend/static/js/main.8632131d.js",
-    "static/js/453.f044db20.chunk.js": "/zillplayer-frontend/static/js/453.f044db20.chunk.js",
+    "main.js": "/zillplayer-frontend/static/js/main.35735a40.js",
+    "static/js/453.36c7da27.chunk.js": "/zillplayer-frontend/static/js/453.36c7da27.chunk.js",
     "static/media/mylogo.png": "/zillplayer-frontend/static/media/mylogo.3248daf684c8f51bb139.png",
     "index.html": "/zillplayer-frontend/index.html",
     "main.34a4fe75.css.map": "/zillplayer-frontend/static/css/main.34a4fe75.css.map",
-    "main.8632131d.js.map": "/zillplayer-frontend/static/js/main.8632131d.js.map",
-    "453.f044db20.chunk.js.map": "/zillplayer-frontend/static/js/453.f044db20.chunk.js.map"
+    "main.35735a40.js.map": "/zillplayer-frontend/static/js/main.35735a40.js.map",
+    "453.36c7da27.chunk.js.map": "/zillplayer-frontend/static/js/453.36c7da27.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.34a4fe75.css",
-    "static/js/main.8632131d.js"
+    "static/js/main.35735a40.js"
   ]
 }
