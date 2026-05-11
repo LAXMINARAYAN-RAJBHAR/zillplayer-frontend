@@ -60,13 +60,20 @@ const SearchResults = () => {
   }, [selectedVideo, selectedVideoIndex, youtubeResults]);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const q = params.get("q");
-    if (q) {
-      setQuery(q);
-      fetchAll(q);
-    }
-  }, [location.search]);
+  // HashRouter stores params inside hash: #/search?q=hindi%20movie
+  // location.search is always "" with HashRouter — must read from hash
+  const hashPart = window.location.hash; // e.g. "#/search?q=hindi%20movie"
+  const queryString = hashPart.includes("?") ? hashPart.split("?")[1] : "";
+  const params = new URLSearchParams(queryString);
+  const q = params.get("q");
+
+  if (q) {
+    setSelectedVideo(null);
+    setSelectedVideoIndex(null);
+    setQuery(q);
+    fetchAll(q);
+  }
+}, [location.hash]); // ← key fix: location.hash changes on every search
 
   const fetchAll = async (q) => {
     setLoading(true);
