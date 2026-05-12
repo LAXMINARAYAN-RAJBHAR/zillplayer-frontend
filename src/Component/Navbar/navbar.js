@@ -270,9 +270,9 @@ const Navbar = ({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             onFocus={() => {
-  if (searchQuery.trim()) setShowDropdown(true);
-}}
-onBlur={() => {}}
+              if (searchQuery.trim()) setShowDropdown(true);
+            }}
+            onBlur={() => {}}
             onBlur={() => setIsSearchFocused(false)}
             autoComplete="off"
           />
@@ -379,23 +379,37 @@ onBlur={() => {}}
 
       {/* RIGHT */}
       <div className="navbar-right">
-        
+        {/* LocalMediaPlayer */}
+        <span
+          onClick={() => navigate("/local-player")}
+          title="Local Player"
+          style={{ cursor: "pointer" }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+            <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z" />
+          </svg>
+        </span>
+
         <Link to="/live-tv" style={{ textDecoration: "none" }}>
-  <div style={{ position: "relative", display: "inline-block" }}>
-    <span style={{ fontSize: "24px" }}>📺</span>
-    <span style={{
-      position: "absolute",
-      top: "-4px",
-      right: "-8px",
-      background: "#ff0000",
-      color: "white",
-      fontSize: "8px",
-      fontWeight: "800",
-      padding: "1px 4px",
-      borderRadius: "3px"
-    }}>LIVE</span>
-  </div>
-</Link>
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <span style={{ fontSize: "24px" }}>📺</span>
+            <span
+              style={{
+                position: "absolute",
+                top: "-4px",
+                right: "-8px",
+                background: "#ff0000",
+                color: "white",
+                fontSize: "8px",
+                fontWeight: "800",
+                padding: "1px 4px",
+                borderRadius: "3px",
+              }}
+            >
+              LIVE
+            </span>
+          </div>
+        </Link>
         <span
           onClick={() =>
             navigate("/youtube", { state: { reload: Date.now() } })
