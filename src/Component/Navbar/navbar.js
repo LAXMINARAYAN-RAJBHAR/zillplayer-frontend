@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import "./navbar.css";
 import ListIcon from "@mui/icons-material/List";
 import MyLogo from "../../assests/mylogo.png";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardVoiceIcon from "@mui/icons-material/KeyboardVoice";
 import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
@@ -11,7 +12,6 @@ import Login from "../Login/login";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 
-// ✅ Outside component — pure functions only
 const getSuggestions = (q) => {
   if (!q.trim()) return [];
   const base = [
@@ -42,7 +42,6 @@ const getNotifStyle = (type) => {
   }
 };
 
-// ✅ ONE Navbar component — clean props
 const Navbar = ({
   currentUser,
   setSideNavbarFunc,
@@ -64,6 +63,8 @@ const Navbar = ({
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isListening, setIsListening] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [logoKey, setLogoKey] = useState(0);
 
   const dropdownRef = useRef(null);
   const notifRef = useRef(null);
@@ -79,13 +80,11 @@ const Navbar = ({
       prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
 
-  // ✅ Auto-close all dropdowns on route change
   useEffect(() => {
     setShowNotifications(false);
     setNavbarModal(false);
   }, [location.pathname]);
 
-  // ✅ Close search dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target))
@@ -95,7 +94,6 @@ const Navbar = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Close notif dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target))
@@ -105,10 +103,17 @@ const Navbar = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLogoKey((prev) => prev + 1);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const sideNavbarFunc = () => setSideNavbarFunc(!sideNavbar);
 
   const handleprofile = () => {
-    navigate(`/user/${currentUser}`); // ✅ dynamic — uses currentUser prop
+    navigate(`/user/${currentUser}`);
     setNavbarModal(false);
   };
 
@@ -133,11 +138,13 @@ const Navbar = ({
   };
 
   const doSearch = (q) => {
-    if (!q.trim()) return;
-    setShowDropdown(false);
-    setSearchQuery(q);
-    navigate(`/search?q=${encodeURIComponent(q)}`);
-  };
+  if (!q.trim()) return;
+  setShowDropdown(false);
+  setSearchQuery(q);
+  setIsSearchFocused(true);
+  navigate(`/search?q=${encodeURIComponent(q)}`);
+  setTimeout(() => setIsSearchFocused(false), 1500);
+};
 
   const handleKeyDown = (e) => {
     if (!showDropdown) {
@@ -216,17 +223,6 @@ const Navbar = ({
     setIsListening(false);
   };
 
-  const [logoKey, setLogoKey] = useState(0);
-
-  useEffect(() => {
-    // "rollamroll" = 10 chars × 0.08s delay + 0.3s to finish last char = ~1.1s total
-    // Loop restarts every 3 seconds
-    const interval = setInterval(() => {
-      setLogoKey((prev) => prev + 1);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div className="navbar">
       {/* LEFT */}
@@ -265,7 +261,7 @@ const Navbar = ({
         ref={dropdownRef}
         style={{ position: "relative" }}
       >
-        <div className="navbar_searchBox">
+        <div className="navbar_searchBox" style={{ position: "relative" }}>
           <input
             type="text"
             placeholder="Search"
@@ -275,17 +271,58 @@ const Navbar = ({
             onKeyDown={handleKeyDown}
             onFocus={() => {
               if (searchQuery.trim()) setShowDropdown(true);
+              setIsSearchFocused(true);
             }}
+            onBlur={() => setIsSearchFocused(false)}
             autoComplete="off"
           />
+
+          {/* ✕ Clear button — only shows when input has text */}
+          {searchQuery && (
+            <div
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setSearchQuery("");
+                setSuggestions([]);
+                setShowDropdown(false);
+              }}
+              title="Clear"
+              style={{
+                position: "absolute",
+                right: "56px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                color: "#aaa",
+                fontSize: "18px",
+                fontWeight: "bold",
+                lineHeight: 1,
+                padding: "4px",
+              }}
+            >
+              ✕
+            </div>
+          )}
+
+          {/* 🔍 Search icon — rotates on focus */}
           <div
             className="navbar_searchIconBox"
-            onClick={() => doSearch(searchQuery)}
+            onClick={() => {
+              setIsSearchFocused(true);
+              setTimeout(() => setIsSearchFocused(false), 800);
+              doSearch(searchQuery);
+            }}
           >
-            <SearchIcon sx={{ fontSize: "28px" }} />
+            <TravelExploreIcon
+              sx={{
+                fontSize: "28px",
+                animation: isSearchFocused ? "spinIcon 0.8s linear" : "none",
+              }}
+            />
           </div>
         </div>
 
+        {/* 🎤 Voice search */}
         <div
           className="navbar_mike"
           onClick={startVoiceSearch}
@@ -300,6 +337,7 @@ const Navbar = ({
           />
         </div>
 
+        {/* 🔽 Suggestions dropdown */}
         {showDropdown && suggestions.length > 0 && (
           <div
             style={{
@@ -361,7 +399,7 @@ const Navbar = ({
           <VideoCameraFrontIcon sx={{ fontSize: "30px", color: "white" }} />
         </span>
 
-        {/* NOTIFICATIONS */}
+        {/* 🔔 NOTIFICATIONS */}
         <div ref={notifRef} style={{ position: "relative" }}>
           <div
             onClick={() => setShowNotifications((prev) => !prev)}
@@ -551,7 +589,7 @@ const Navbar = ({
           )}
         </div>
 
-        {/* Profile */}
+        {/* 👤 Profile */}
         <img
           onClick={() => setNavbarModal((prev) => !prev)}
           src={userPic}
@@ -581,7 +619,7 @@ const Navbar = ({
 
       {login && <Login setLoginModal={setLoginModal} />}
 
-      {/* Voice Search Modal */}
+      {/* 🎤 Voice Search Modal */}
       {isListening && (
         <div
           style={{
