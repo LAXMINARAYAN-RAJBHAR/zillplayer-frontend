@@ -17,24 +17,26 @@ const LiveTVPage = ({ sideNavbar }) => {
     <div className={`liveTVPage ${sideNavbar ? "sidebar-open" : "sidebar-closed"}`}>
 
       {/* Player */}
-<div className="liveTV_player">
-  <div className="liveTV_noStream">
-    <img
-      src={activeChannel.thumbnail}
-      alt={activeChannel.name}
-      className="liveTV_noStreamThumb"
-    />
-    <div className="liveTV_noStreamOverlay">
-      <span className="liveTV_liveBadge">● LIVE</span>
-      <h2 className="liveTV_channelTitle">{activeChannel.name}</h2>
-      <p className="liveTV_channelDesc">{activeChannel.description}</p>
-      <p className="liveTV_viewers">👁 {activeChannel.viewers} watching</p>
-      <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px", marginTop: "8px" }}>
-        🔒 Live stream coming soon
-      </p>
-    </div>
-  </div>
-</div>
+      <div className="liveTV_player">
+        {activeChannel.streamUrl ? (
+          <video
+            src={activeChannel.streamUrl}
+            controls
+            autoPlay
+            className="liveTV_video"
+          />
+        ) : (
+          <div className="liveTV_noStream">
+            <img src={activeChannel.thumbnail} alt={activeChannel.name} className="liveTV_noStreamThumb" />
+            <div className="liveTV_noStreamOverlay">
+              <span className="liveTV_liveBadge">● LIVE</span>
+              <h2 className="liveTV_channelTitle">{activeChannel.name}</h2>
+              <p className="liveTV_channelDesc">{activeChannel.description}</p>
+              <p className="liveTV_viewers">👁 {activeChannel.viewers} watching</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Category Tabs */}
       <div className="liveTV_tabs">

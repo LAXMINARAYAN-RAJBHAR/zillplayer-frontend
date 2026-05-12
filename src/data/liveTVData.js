@@ -3,7 +3,7 @@ export const liveTVChannels = [
     id: 1,
     name: "DD National",
     category: "News",
-    streamUrl: "https://dd-national-live.example.m3u8", // replace with real HLS stream
+    streamUrl: "https://ddnatlive.com/hls/stream.m3u8", // replace with real HLS stream
     thumbnail: "https://picsum.photos/seed/ddnational/320/180",
     viewers: "12,430",
     description: "National News & Current Affairs",
