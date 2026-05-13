@@ -559,6 +559,8 @@ const Video = () => {
   // With this — store comments keyed by video id:
   const [allComments, setAllComments] = useState({});
 
+  const loggedInUser = localStorage.getItem("username") || "Guest"; // ✅ here
+
   // Derive current video's comments
   const comments = allComments[id] ?? defaultComments;
 
@@ -614,11 +616,11 @@ const Video = () => {
   const handleCommentSubmit = () => {
     if (!message.trim()) return;
     const newComment = {
-      id: Date.now(),
-      user: "Laxminarayan",
-      text: message,
-      date: new Date().toISOString().slice(0, 10),
-    };
+  id: Date.now(),
+  user: loggedInUser, // ✅ dynamic
+  text: message,
+  date: new Date().toISOString().slice(0, 10),
+};
     setAllComments((prev) => ({
       ...prev,
       [id]: [newComment, ...(prev[id] ?? defaultComments)],
