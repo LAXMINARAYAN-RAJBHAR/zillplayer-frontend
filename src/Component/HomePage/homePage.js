@@ -550,11 +550,11 @@ const HomePage = ({ sideNavbar }) => {
   const [watchVideo, setWatchVideo] = useState(null);
 
   const options = [
-    "All","DD News","News","Film Criticisms","Twenty20 Cricket","Music","Live",
-    "Mixes","Gaming","Debates","Coke Studio India","Democracy","Pakistani Dramas",
-    "Comedy","Podcasts","Dramedy","Web Development","Dubbing","Web Series",
-    "Professional Wrestling","Bhojpuri Cinema","Superhero movies","Astronomy",
-    "AI","History","Indian Music","Recently Uploaded","Watched",
+    "All","DD News", "Kapil Sharma Show", "Hindi Movies", "Hindi News","English News","Film Criticisms","Twenty20 Cricket","Music","Live",
+    "Mixes","Gaming","Debates","Coke Studio India","Democracy","Pakistani Dramas","Pakistani Movies",
+    "Comedy","Podcasts","Dramedy","Web Development","Hollywood Movies","Dubbed Hollywood Movies","Web Series",
+    "Professional Wrestling","Bhojpuri Cinema","Bhojpuri Songs","Superhero Movies","Astronomy",
+    "AI","History","Indian Music","Indian Movies","Recently Uploaded","Watched",
   ];
 
   useEffect(() => { fetchYouTubeByTopic(selectedOption); }, [selectedOption]);
@@ -566,7 +566,7 @@ const HomePage = ({ sideNavbar }) => {
       const keyIndex = (currentKeyIndex + i) % API_KEYS.length;
       try {
         const res = await axios.get("https://www.googleapis.com/youtube/v3/search", {
-          params: { part: "snippet", q: topic, type: "video", maxResults: 20, order: "relevance", key: API_KEYS[keyIndex] },
+          params: { part: "snippet", q: topic, type: "video", maxResults: 50, order: "relevance", key: API_KEYS[keyIndex] },
         });
         currentKeyIndex = keyIndex;
         setYtVideos(res.data.items || []);
