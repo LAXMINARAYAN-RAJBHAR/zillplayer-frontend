@@ -528,49 +528,29 @@ const HomePage = ({ sideNavbar }) => {
   const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState("All");
 
-  // ✅ YouTube topic results + loading state
+  // YouTube states
   const [ytVideos, setYtVideos] = useState([]);
   const [ytLoading, setYtLoading] = useState(false);
 
+  // ✅ Video player modal states
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [currentVideoId, setCurrentVideoId] = useState(null);
+  const [currentVideoTitle, setCurrentVideoTitle] = useState("");
+  const [currentChannel, setCurrentChannel] = useState("");
+
   const options = [
-    "All",
-    "DD News",
-    "News",
-    "Film Criticisms",
-    "Twenty20 Cricket",
-    "Music",
-    "Live",
-    "Mixes",
-    "Gaming",
-    "Debates",
-    "Coke Studio India",
-    "Democracy",
-    "Pakistani Dramas",
-    "Comedy",
-    "Podcasts",
-    "Dramedy",
-    "Web Development",
-    "Dubbing",
-    "Web Series",
-    "Professional Wrestling",
-    "Bhojpuri Cinema",
-    "Superhero movies",
-    "Astronomy",
-    "AI",
-    "History",
-    "Indian Music",
-    "Recently Uploaded",
-    "Watched",
+    "All", "DD News", "News", "Film Criticisms", "Twenty20 Cricket", "Music", "Live", 
+    "Mixes", "Gaming", "Debates", "Coke Studio India", "Democracy", "Pakistani Dramas", 
+    "Comedy", "Podcasts", "Dramedy", "Web Development", "Dubbing", "Web Series", 
+    "Professional Wrestling", "Bhojpuri Cinema", "Superhero movies", "Astronomy", 
+    "AI", "History", "Indian Music", "Recently Uploaded", "Watched"
   ];
 
-  // ✅ Fetch YouTube videos whenever the selected option changes
   useEffect(() => {
     fetchYouTubeByTopic(selectedOption);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedOption]);
 
   const fetchYouTubeByTopic = async (topic) => {
-    // Don't fetch for "All" tab — keep it as the default home feed
     if (topic === "All" || topic === "Recently Uploaded" || topic === "Watched") {
       setYtVideos([]);
       return;
@@ -582,19 +562,16 @@ const HomePage = ({ sideNavbar }) => {
     for (let i = 0; i < API_KEYS.length; i++) {
       const keyIndex = (currentKeyIndex + i) % API_KEYS.length;
       try {
-        const res = await axios.get(
-          "https://www.googleapis.com/youtube/v3/search",
-          {
-            params: {
-              part: "snippet",
-              q: topic,
-              type: "video",
-              maxResults: 20,
-              order: "relevance",
-              key: API_KEYS[keyIndex],
-            },
-          }
-        );
+        const res = await axios.get("https://www.googleapis.com/youtube/v3/search", {
+          params: {
+            part: "snippet",
+            q: topic,
+            type: "video",
+            maxResults: 20,
+            order: "relevance",
+            key: API_KEYS[keyIndex],
+          },
+        });
         currentKeyIndex = keyIndex;
         setYtVideos(res.data.items || []);
         break;
@@ -607,18 +584,32 @@ const HomePage = ({ sideNavbar }) => {
         break;
       }
     }
-
     setYtLoading(false);
   };
 
-  // ✅ Filter local videos based on selected option
-  const filteredVideos =
-    selectedOption === "All"
-      ? videos
-      : videos.filter((v) => v.tags?.includes(selectedOption));
+  // ✅ Open YouTube video modal
+  const openYouTubeVideo = (videoId, title, channel) => {
+    setCurrentVideoId(videoId);
+    setCurrentVideoTitle(title);
+    setCurrentChannel(channel);
+    setIsVideoModalOpen(true);
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+  };
 
-  // ─── Sub-components ───────────────────────────────────────────────
+  // ✅ Close video modal
+  const closeVideoModal = () => {
+    setIsVideoModalOpen(false);
+    setCurrentVideoId(null);
+    setCurrentVideoTitle("");
+    setCurrentChannel("");
+    document.body.style.overflow = 'unset'; // Restore scroll
+  };
 
+  const filteredVideos = selectedOption === "All"
+    ? videos
+    : videos.filter((v) => v.tags?.includes(selectedOption));
+
+  // ShortsRow component (unchanged)
   const ShortsRow = ({ data, title }) => (
     <div className="homePage_shortsSection">
       <div className="homePage_shortsHeader">
@@ -633,11 +624,7 @@ const HomePage = ({ sideNavbar }) => {
             style={{ cursor: "pointer" }}
           >
             <div className="homePage_shortThumbnail">
-              <img
-                src={short.thumbnail}
-                alt={short.user}
-                className="homePage_shortImg"
-              />
+              <img src={short.thumbnail} alt={short.user} className="homePage_shortImg" />
               <div className="homePage_shortPlay">▶</div>
               <div className="homePage_shortDuration">{short.duration}</div>
             </div>
@@ -655,15 +642,11 @@ const HomePage = ({ sideNavbar }) => {
     </div>
   );
 
-  // Local video card
+  // VideoCard for local videos (unchanged)
   const VideoCard = ({ video }) => (
     <div className="youtube_thumbnailBox">
       <Link to={`/video/${video.id}`} className="youtube_thumbnailWrapper">
-        <img
-          src={video.thumbnail}
-          alt={video.title}
-          className="youtube_thumbnailPic"
-        />
+        <img src={video.thumbnail} alt={video.title} className="youtube_thumbnailPic" />
         <div className="youtube_timingThumbnail">{video.duration}</div>
       </Link>
       <div className="youtubeTitleBox">
@@ -688,28 +671,23 @@ const HomePage = ({ sideNavbar }) => {
     </div>
   );
 
-  // ✅ YouTube video card — opens video in YouTube
+  // ✅ Updated YouTubeVideoCard - opens modal
   const YouTubeVideoCard = ({ item }) => (
     <div
       className="youtube_thumbnailBox"
       style={{ cursor: "pointer" }}
-      onClick={() =>
-        window.open(
-          `https://www.youtube.com/watch?v=${item.id.videoId}`,
-          "_blank"
-        )
-      }
+      onClick={() => openYouTubeVideo(
+        item.id.videoId,
+        item.snippet.title,
+        item.snippet.channelTitle
+      )}
     >
-      <div
-        className="youtube_thumbnailWrapper"
-        style={{ position: "relative", display: "block" }}
-      >
+      <div className="youtube_thumbnailWrapper" style={{ position: "relative", display: "block" }}>
         <img
           src={item.snippet.thumbnails.medium.url}
           alt={item.snippet.title}
           className="youtube_thumbnailPic"
         />
-        {/* ✅ YouTube badge so user knows it's an external video */}
         <div
           style={{
             position: "absolute",
@@ -730,9 +708,7 @@ const HomePage = ({ sideNavbar }) => {
       <div className="youtubeTitleBox">
         <div className="youtubeBoxProfile">
           <img
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-              item.snippet.channelTitle
-            )}&background=random&size=36`}
+            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(item.snippet.channelTitle)}&background=random&size=36`}
             alt={item.snippet.channelTitle}
             className="youtube_thumbnail_Profile"
           />
@@ -752,7 +728,7 @@ const HomePage = ({ sideNavbar }) => {
     </div>
   );
 
-  // ✅ Skeleton loader cards while YouTube is fetching
+  // SkeletonCard (unchanged)
   const SkeletonCard = () => (
     <div className="youtube_thumbnailBox">
       <div
@@ -799,11 +775,92 @@ const HomePage = ({ sideNavbar }) => {
     </div>
   );
 
-  // ─── Render ───────────────────────────────────────────────────────
+  // ✅ Video Modal Component
+  const VideoModal = () => (
+    <>
+      <div 
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          background: "rgba(0,0,0,0.98)",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px",
+        }}
+        onClick={closeVideoModal}
+      />
+      <div 
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "min(95vw, 1000px)",
+          maxHeight: "95vh",
+          aspectRatio: "16/9",
+          background: "#000",
+          borderRadius: "16px",
+          zIndex: 10000,
+          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {currentVideoId && (
+          <iframe
+            src={`https://www.youtube.com/embed/${currentVideoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{
+              width: "100%",
+              height: "100%",
+              borderRadius: "16px",
+              border: "none",
+            }}
+            title={currentVideoTitle}
+          />
+        )}
+        
+        {/* Close Button */}
+        <button
+          onClick={closeVideoModal}
+          style={{
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+            width: "44px",
+            height: "44px",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.15)",
+            border: "none",
+            color: "white",
+            fontSize: "20px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            backdropFilter: "blur(20px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.3s ease",
+            zIndex: 2,
+          }}
+          onMouseEnter={(e) => e.target.style.background = "rgba(255,255,255,0.25)"}
+          onMouseLeave={(e) => e.target.style.background = "rgba(255,255,255,0.15)"}
+        >
+          ×
+        </button>
+      </div>
+    </>
+  );
 
   return (
     <div className="homePage">
-      {/* ── OPTIONS BAR ── */}
+      {/* Options Bar (unchanged) */}
       <div className={`homePage_options ${sideNavbar ? "sidebar-open" : ""}`}>
         <div className="homePage_options_track">
           {options.map((item) => (
@@ -828,211 +885,101 @@ const HomePage = ({ sideNavbar }) => {
         </div>
       </div>
 
-      <div
-        className={`home_mainPage ${
-          sideNavbar ? "sidebar-open" : "sidebar-closed"
-        }`}
-      >
-        {/* ══════════════════════════════════════════
-            "All" tab — shorts interleaved with local videos (unchanged)
-        ══════════════════════════════════════════ */}
+      <div className={`home_mainPage ${sideNavbar ? "sidebar-open" : "sidebar-closed"}`}>
         {selectedOption === "All" ? (
-          Array.from({ length: Math.ceil(reelsData.length / 6) }).map(
-            (_, rowIndex) => {
-              const start = rowIndex * 5;
-              const end = start + 9;
-              const videoStart = rowIndex * 8;
-              const videoEnd = videoStart + 12;
+          Array.from({ length: Math.ceil(reelsData.length / 6) }).map((_, rowIndex) => {
+            const start = rowIndex * 5;
+            const end = start + 9;
+            const videoStart = rowIndex * 8;
+            const videoEnd = videoStart + 12;
 
-              return (
-                <React.Fragment key={rowIndex}>
-                  <ShortsRow
-                    data={reelsData.slice(start, end)}
-                    title={rowIndex === 0 ? "Shorts" : "More Shorts"}
-                  />
-                  {filteredVideos.slice(videoStart, videoEnd).length > 0 && (
-                    <div className="youtube_VideoGrid">
-                      {filteredVideos
-                        .slice(videoStart, videoEnd)
-                        .map((video) => (
-                          <VideoCard key={video.id} video={video} />
-                        ))}
-                    </div>
-                  )}
-                </React.Fragment>
-              );
-            }
-          )
+            return (
+              <React.Fragment key={rowIndex}>
+                <ShortsRow
+                  data={reelsData.slice(start, end)}
+                  title={rowIndex === 0 ? "Shorts" : "More Shorts"}
+                />
+                {filteredVideos.slice(videoStart, videoEnd).length > 0 && (
+                  <div className="youtube_VideoGrid">
+                    {filteredVideos.slice(videoStart, videoEnd).map((video) => (
+                      <VideoCard key={video.id} video={video} />
+                    ))}
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })
         ) : (
-          /* ══════════════════════════════════════════
-              Topic tab — local videos + YouTube results
-          ══════════════════════════════════════════ */
           <div style={{ padding: "16px 20px" }}>
-
-            {/* ── Section header ── */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "20px",
-              }}
-            >
-              <span style={{ fontSize: "20px" }}>
-                {ytLoading ? "⏳" : "🔎"}
-              </span>
-              <h2
-                style={{
-                  color: "white",
-                  fontSize: "18px",
-                  fontWeight: "700",
-                  margin: 0,
-                }}
-              >
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
+              <span style={{ fontSize: "20px" }}>{ytLoading ? "⏳" : "🔎"}</span>
+              <h2 style={{ color: "white", fontSize: "18px", fontWeight: "700", margin: 0 }}>
                 {selectedOption}
               </h2>
-              {ytLoading && (
-                <span style={{ color: "#aaa", fontSize: "13px" }}>
-                  — loading YouTube results...
-                </span>
-              )}
+              {ytLoading && <span style={{ color: "#aaa", fontSize: "13px" }}>- loading YouTube results...</span>}
             </div>
 
-            {/* ── LOCAL VIDEOS ── */}
             {filteredVideos.length > 0 && (
               <div style={{ marginBottom: "40px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "14px",
-                  }}
-                >
-                  <span
-                    style={{
-                      background: "#272727",
-                      color: "#aaa",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      padding: "3px 10px",
-                      borderRadius: "20px",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                  <span style={{ background: "#272727", color: "#aaa", fontSize: "12px", fontWeight: "600", padding: "3px 10px", borderRadius: "20px", letterSpacing: "0.5px" }}>
                     🎬 LOCAL VIDEOS
                   </span>
                   <span style={{ color: "#555", fontSize: "12px" }}>
-                    {filteredVideos.length} video
-                    {filteredVideos.length !== 1 ? "s" : ""}
+                    {filteredVideos.length} video{filteredVideos.length !== 1 ? "s" : ""}
                   </span>
                 </div>
                 <div className="youtube_VideoGrid">
-                  {filteredVideos.map((video) => (
-                    <VideoCard key={video.id} video={video} />
-                  ))}
+                  {filteredVideos.map((video) => <VideoCard key={video.id} video={video} />)}
                 </div>
               </div>
             )}
 
-            {/* ── YOUTUBE SKELETONS while loading ── */}
             {ytLoading && (
               <div style={{ marginBottom: "40px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "14px",
-                  }}
-                >
-                  <span
-                    style={{
-                      background: "#ff000022",
-                      color: "#ff4444",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      padding: "3px 10px",
-                      borderRadius: "20px",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                  <span style={{ background: "#ff000022", color: "#ff4444", fontSize: "12px", fontWeight: "600", padding: "3px 10px", borderRadius: "20px", letterSpacing: "0.5px" }}>
                     ▶ YOUTUBE
                   </span>
-                  <span style={{ color: "#555", fontSize: "12px" }}>
-                    fetching...
-                  </span>
+                  <span style={{ color: "#555", fontSize: "12px" }}>fetching...</span>
                 </div>
                 <div className="youtube_VideoGrid">
-                  {[...Array(8)].map((_, i) => (
-                    <SkeletonCard key={i} />
-                  ))}
+                  {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
                 </div>
               </div>
             )}
 
-            {/* ── YOUTUBE RESULTS ── */}
             {!ytLoading && ytVideos.length > 0 && (
-              <div style={{ marginBottom: "40px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "14px",
-                  }}
-                >
-                  <span
-                    style={{
-                      background: "#ff000022",
-                      color: "#ff4444",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      padding: "3px 10px",
-                      borderRadius: "20px",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                  <span style={{ background: "#ff000022", color: "#ff4444", fontSize: "12px", fontWeight: "600", padding: "3px 10px", borderRadius: "20px", letterSpacing: "0.5px" }}>
                     ▶ YOUTUBE
                   </span>
-                  <span style={{ color: "#555", fontSize: "12px" }}>
-                    {ytVideos.length} videos
-                  </span>
+                  <span style={{ color: "#555", fontSize: "12px" }}>{ytVideos.length} videos</span>
                 </div>
                 <div className="youtube_VideoGrid">
-                  {ytVideos.map((item) => (
-                    <YouTubeVideoCard key={item.id.videoId} item={item} />
-                  ))}
+                  {ytVideos.map((item) => <YouTubeVideoCard key={item.id.videoId} item={item} />)}
                 </div>
               </div>
             )}
 
-            {/* ── NO RESULTS AT ALL ── */}
-            {!ytLoading &&
-              filteredVideos.length === 0 &&
-              ytVideos.length === 0 && (
-                <div style={{ textAlign: "center", marginTop: "80px" }}>
-                  <div style={{ fontSize: "48px", marginBottom: "16px" }}>
-                    📭
-                  </div>
-                  <p style={{ color: "#555", fontSize: "16px" }}>
-                    No videos found for "
-                    <span style={{ color: "#aaa" }}>{selectedOption}</span>"
-                  </p>
-                  <p
-                    style={{
-                      color: "#444",
-                      fontSize: "13px",
-                      marginTop: "8px",
-                    }}
-                  >
-                    Try selecting a different category
-                  </p>
-                </div>
-              )}
+            {!ytLoading && filteredVideos.length === 0 && ytVideos.length === 0 && (
+              <div style={{ textAlign: "center", marginTop: "80px" }}>
+                <div style={{ fontSize: "48px", marginBottom: "16px" }}>📭</div>
+                <p style={{ color: "#555", fontSize: "16px" }}>
+                  No videos found for "<span style={{ color: "#aaa" }}>{selectedOption}</span>"
+                </p>
+                <p style={{ color: "#444", fontSize: "13px", marginTop: "8px" }}>
+                  Try selecting a different category
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      {/* ✅ Video Modal - renders ABOVE everything */}
+      {isVideoModalOpen && <VideoModal />}
 
       <style>{`
         @keyframes pulse {
