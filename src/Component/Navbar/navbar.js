@@ -472,7 +472,7 @@ const Navbar = ({
           <ListIcon sx={{ color: "white" }} />
         </div>
         <Link to="/" className="navbar-logo-link">
-
+        
           <svg
             width="42"
             height="42"
@@ -492,9 +492,15 @@ const Navbar = ({
               fontFamily="Arial"
             >
               Z
+              <animate
+                attributeName="opacity"
+                values="1;0.2;1;0.5;1"
+                dur="2s"
+                repeatCount="indefinite"
+              />
             </text>
           </svg>
-          
+
           <span
             key={logoKey}
             className="logoText"

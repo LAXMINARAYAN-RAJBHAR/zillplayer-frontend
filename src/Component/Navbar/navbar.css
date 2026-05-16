@@ -62,10 +62,14 @@
 
 /* ✅ Fix: Smaller logo so it fits inside 56px navbar */
 .mylogo {
-  height: 36px;
-  width: 36px;
-  border-radius: 50%;
-  object-fit: cover;       /* was 'contain' — cover fills the circle cleanly */
+  width: 42px;
+  height: 42px;
+  transition: filter 0.3s ease;
+}
+
+.mylogo:hover {
+  filter: drop-shadow(0 0 8px #ff0000) drop-shadow(0 0 16px #ff4444);
+  transform: scale(1.1);
 }
 /* ✅ Fix: Link must be flex so logo + text sit side by side */
 .navbar-logo-link {
